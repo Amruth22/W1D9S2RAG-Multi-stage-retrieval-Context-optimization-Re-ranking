@@ -225,10 +225,10 @@ startxref
 
 
 
-    def test_5_multistage_retrieval_validation(self):
-        """Test 5: Multi-stage retrieval pipeline validation"""
+    def test_4_multistage_retrieval_validation(self):
+        """Test 4: Multi-stage retrieval pipeline validation"""
         print("\n" + "="*60)
-        print("Test 5: Multi-Stage Retrieval Pipeline Validation (HTTP)")
+        print("Test 4: Multi-Stage Retrieval Pipeline Validation (HTTP)")
         print("="*60)
         
         # Setup diverse test documents for better retrieval testing
@@ -298,7 +298,7 @@ startxref
             assert response.status_code in [400, 422, 500]
             print("PASS: Server handles multi-stage retrieval errors")
         
-        print("PASS: Test 5 PASSED: Multi-stage retrieval pipeline validated via HTTP")
+        print("PASS: Test 4 PASSED: Multi-stage retrieval pipeline validated via HTTP")
 
 
 
@@ -310,10 +310,10 @@ startxref
 
 
 
-    def test_13_end_to_end_pipeline(self):
-        """Test 13: Complete end-to-end pipeline validation"""
+    def test_5_end_to_end_pipeline(self):
+        """Test 5: Complete end-to-end pipeline validation"""
         print("\n" + "="*60)
-        print("Test 13: End-to-End Pipeline Validation (HTTP)")
+        print("Test 5: End-to-End Pipeline Validation (HTTP)")
         print("="*60)
         
         # Complete pipeline test: Upload → Process → Embed → Store → Query → Retrieve → Re-rank → Generate
@@ -398,7 +398,7 @@ startxref
         assert processing_time < 30, f"Pipeline should complete within 30 seconds, took {processing_time:.2f}s"
         print(f"PASS: Performance - Pipeline completed in {processing_time:.2f} seconds")
         
-        print("PASS: Test 13 PASSED: Complete end-to-end pipeline validated via HTTP")
+        print("PASS: Test 5 PASSED: Complete end-to-end pipeline validated via HTTP")
 
 def run_all_tests():
     """Run all tests in sequence using HTTP requests to running server"""
@@ -419,8 +419,8 @@ def run_all_tests():
         test_instance.test_1_health_endpoints,
         test_instance.test_2_document_upload,
         test_instance.test_3_pdf_upload,
-        test_instance.test_5_multistage_retrieval_validation,
-        test_instance.test_13_end_to_end_pipeline
+        test_instance.test_4_multistage_retrieval_validation,
+        test_instance.test_5_end_to_end_pipeline
     ]
     
     passed_tests = 0
