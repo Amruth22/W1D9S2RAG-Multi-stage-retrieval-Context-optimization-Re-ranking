@@ -304,16 +304,6 @@ startxref
         
         print("PASS: Test 4 PASSED: Multi-stage retrieval pipeline validated via HTTP")
 
-
-
-
-
-
-
-
-
-
-
     def test_4_end_to_end_pipeline(self):
         """Test 4: Complete end-to-end pipeline validation"""
         print("\n" + "="*60)
@@ -379,13 +369,13 @@ startxref
         assert data["original_query"] != data["expanded_query"], "Query expansion should modify query"
         print(f"PASS: Multi-stage retrieval - Original: '{data['original_query']}'")
             # Verify re-ranking and context optimization (check if citation_number exists)
-            for i, result in enumerate(results):
-                if "citation_number" in result:
-                    assert result["citation_number"] == i + 1, "Citations should be numbered"
-                else:
-                    print(f"INFO: Citation number not present in result {i+1}")
-                assert "score" in result, "Results should have relevance scores"
-                assert "content" in result, "Results should have content"
+        for i, result in enumerate(results):
+            if "citation_number" in result:
+                assert result["citation_number"] == i + 1, "Citations should be numbered"
+            else:
+                print(f"INFO: Citation number not present in result {i+1}")
+            assert "score" in result, "Results should have relevance scores"
+            assert "content" in result, "Results should have content"
         
         # Verify re-ranking and context optimization
         for i, result in enumerate(results):
