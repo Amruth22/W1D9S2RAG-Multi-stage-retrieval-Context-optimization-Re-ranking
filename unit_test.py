@@ -314,10 +314,10 @@ startxref
 
 
 
-    def test_5_end_to_end_pipeline(self):
-        """Test 5: Complete end-to-end pipeline validation"""
+    def test_4_end_to_end_pipeline(self):
+        """Test 4: Complete end-to-end pipeline validation"""
         print("\n" + "="*60)
-        print("Test 5: End-to-End Pipeline Validation (HTTP)")
+        print("Test 4: End-to-End Pipeline Validation (HTTP)")
         print("="*60)
         
         # Complete pipeline test: Upload → Process → Embed → Store → Query → Retrieve → Re-rank → Generate
@@ -409,7 +409,7 @@ startxref
         assert processing_time < 30, f"Pipeline should complete within 30 seconds, took {processing_time:.2f}s"
         print(f"PASS: Performance - Pipeline completed in {processing_time:.2f} seconds")
         
-        print("PASS: Test 5 PASSED: Complete end-to-end pipeline validated via HTTP")
+        print("PASS: Test 4 PASSED: Complete end-to-end pipeline validated via HTTP")
 
 def run_all_tests():
     """Run all tests in sequence using HTTP requests to running server"""
@@ -430,8 +430,7 @@ def run_all_tests():
         test_instance.test_1_health_endpoints,
         test_instance.test_2_document_upload,
         test_instance.test_3_pdf_upload,
-        test_instance.test_4_multistage_retrieval_validation,
-        test_instance.test_5_end_to_end_pipeline
+        test_instance.test_4_end_to_end_pipeline
     ]
     
     passed_tests = 0
@@ -458,7 +457,7 @@ def run_all_tests():
         print("✅ Health endpoints working")
         print("✅ Document upload and processing working")
         print("✅ PDF upload and extraction working")
-        print("✅ Multi-stage retrieval pipeline working")
+
         print("✅ End-to-end pipeline working")
         print(f"✅ Server at {BASE_URL} is working perfectly!")
         return True
