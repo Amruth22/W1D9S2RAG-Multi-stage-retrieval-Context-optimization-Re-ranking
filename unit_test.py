@@ -16,7 +16,7 @@ from typing import List, Dict, Any
 
 # Default server configuration (matches main.py default)
 SERVER_HOST = "localhost"
-SERVER_PORT = 8000
+SERVER_PORT = 8080
 BASE_URL = f"http://{SERVER_HOST}:{SERVER_PORT}"
 
 class TestRAGSystemAPI:
