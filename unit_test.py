@@ -277,18 +277,19 @@ startxref
                 required_fields = ["id", "content", "metadata", "score", "citation_number"]
                 for field in required_fields:
                     assert field in result, f"Missing field {field} in result {i}"
-                
                 # Verify citation numbering (if present)
                 if "citation_number" in result:
                     assert result["citation_number"] == i + 1, f"Citation number should be {i + 1}"
                 else:
                     print(f"INFO: Citation number not present in result {i+1}")
+                    print(f"INFO: Citation number not present in result {i+1}")
                 
                 # Verify score is reasonable
                 assert 0 <= result["score"] <= 1, f"Score should be between 0 and 1, got {result['score']}"
             
-            print(f"PASS: Retrieved {len(results)} results with proper structure")
-            print(f"PASS: Results have citation numbers: {[r['citation_number'] for r in results]}")
+            # Verify results structure
+            citation_numbers = [r.get('citation_number', 'N/A') for r in results]
+            print(f"PASS: Results citation info: {citation_numbers}")
             print(f"PASS: Results have scores: {[round(r['score'], 3) for r in results]}")
             
             # Verify results are ordered by relevance (descending scores)
@@ -377,7 +378,14 @@ startxref
         # Verify multi-stage retrieval
         assert data["original_query"] != data["expanded_query"], "Query expansion should modify query"
         print(f"PASS: Multi-stage retrieval - Original: '{data['original_query']}'")
-        print(f"PASS: Multi-stage retrieval - Expanded: '{data['expanded_query']}'")
+            # Verify re-ranking and context optimization (check if citation_number exists)
+            for i, result in enumerate(results):
+                if "citation_number" in result:
+                    assert result["citation_number"] == i + 1, "Citations should be numbered"
+                else:
+                    print(f"INFO: Citation number not present in result {i+1}")
+                assert "score" in result, "Results should have relevance scores"
+                assert "content" in result, "Results should have content"
         
         # Verify re-ranking and context optimization
         for i, result in enumerate(results):
