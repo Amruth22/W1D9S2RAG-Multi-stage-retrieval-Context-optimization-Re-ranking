@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+import sys
+import pysqlite3
+sys.modules['sqlite3'] = pysqlite3
 import os
 
 # Create the FastAPI app
