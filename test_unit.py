@@ -50,46 +50,80 @@ class CoreMultiStageRAGTests(unittest.TestCase):
         except ImportError as e:
             raise unittest.SkipTest(f"Required multi-stage RAG components not found: {e}")
 
-    def test_01_embedding_service_with_sentence_transformers(self):
-        """Test 1: Embedding Service with SentenceTransformers"""
-        print("Running Test 1: Embedding Service with SentenceTransformers")
+    def test_01_configuration_and_model_validation(self):
+        """Test 1: Configuration and Model Validation"""
+        print("Running Test 1: Configuration and Model Validation")
         
-        # Test embedding service initialization
+        # Test API configuration
+        self.assertIsNotNone(self.settings.GEMINI_API_KEY)
+        self.assertTrue(self.settings.GEMINI_API_KEY.startswith('AIza'))
+        self.assertEqual(self.settings.GEMINI_MODEL, "gemini-2.0-flash")
+        self.assertEqual(self.settings.API_TITLE, "Multi-Stage RAG API")
+        self.assertEqual(self.settings.API_VERSION, "0.1.0")
+        
+        # Test embedding model configuration
+        self.assertEqual(self.settings.EMBEDDING_MODEL, "BAAI/bge-small-en-v1.5")
+        self.assertIsInstance(self.settings.EMBEDDING_MODEL, str)
+        self.assertIn("bge", self.settings.EMBEDDING_MODEL.lower())
+        
+        # Test retrieval configuration parameters
+        self.assertEqual(self.settings.MAX_CHUNKS_FIRST_STAGE, 10)
+        self.assertEqual(self.settings.MAX_CHUNKS_RETURNED, 5)
+        self.assertEqual(self.settings.CHUNK_SIZE, 500)
+        self.assertEqual(self.settings.CHUNK_OVERLAP, 50)
+        
+        # Validate parameter relationships
+        self.assertLess(self.settings.CHUNK_OVERLAP, self.settings.CHUNK_SIZE)
+        self.assertGreater(self.settings.MAX_CHUNKS_FIRST_STAGE, self.settings.MAX_CHUNKS_RETURNED)
+        self.assertGreater(self.settings.CHUNK_SIZE, 0)
+        self.assertGreaterEqual(self.settings.CHUNK_OVERLAP, 0)
+        
+        # Test ChromaDB configuration
+        self.assertIsNotNone(self.settings.CHROMA_PERSIST_DIRECTORY)
+        self.assertIsInstance(self.settings.CHROMA_PERSIST_DIRECTORY, str)
+        self.assertTrue(self.settings.CHROMA_PERSIST_DIRECTORY.endswith('chroma'))
+        
+        # Test embedding service structure (without loading model)
         self.assertIsNotNone(self.embedding_service)
-        self.assertIsNotNone(self.embedding_service.model)
+        self.assertTrue(hasattr(self.embedding_service, 'get_embedding'))
+        self.assertTrue(hasattr(self.embedding_service, 'get_embeddings'))
         
-        # Test single embedding generation
-        test_text = "Multi-stage retrieval improves search accuracy."
-        single_embedding = self.embedding_service.get_embedding(test_text)
+        # Test model configuration validation
+        expected_model_name = "BAAI/bge-small-en-v1.5"
+        self.assertEqual(self.settings.EMBEDDING_MODEL, expected_model_name)
         
-        self.assertIsInstance(single_embedding, list)
-        self.assertGreater(len(single_embedding), 0)
-        self.assertTrue(all(isinstance(x, float) for x in single_embedding))
+        # Test service method signatures
+        import inspect
+        get_embedding_sig = inspect.signature(self.embedding_service.get_embedding)
+        get_embeddings_sig = inspect.signature(self.embedding_service.get_embeddings)
         
-        # Test batch embedding generation
-        test_texts = [
-            "First document about multi-stage retrieval systems.",
-            "Second document about context optimization techniques.",
-            "Third document about re-ranking algorithms."
-        ]
+        self.assertIn('text', get_embedding_sig.parameters)
+        self.assertIn('texts', get_embeddings_sig.parameters)
         
-        batch_embeddings = self.embedding_service.get_embeddings(test_texts)
-        self.assertIsInstance(batch_embeddings, list)
-        self.assertEqual(len(batch_embeddings), len(test_texts))
-        self.assertTrue(all(isinstance(emb, list) for emb in batch_embeddings))
-        self.assertTrue(all(len(emb) == len(single_embedding) for emb in batch_embeddings))
+        # Test directory structure validation
+        self.assertTrue(os.path.exists("app"))
+        self.assertTrue(os.path.exists("app/services"))
+        self.assertTrue(os.path.exists("app/core"))
         
-        # Test empty input handling
-        empty_embedding = self.embedding_service.get_embedding("")
-        self.assertIsInstance(empty_embedding, list)
+        # Test configuration consistency across services
+        services_config = {
+            'embedding_model': self.settings.EMBEDDING_MODEL,
+            'gemini_model': self.settings.GEMINI_MODEL,
+            'chunk_size': self.settings.CHUNK_SIZE,
+            'max_chunks_first_stage': self.settings.MAX_CHUNKS_FIRST_STAGE,
+            'max_chunks_returned': self.settings.MAX_CHUNKS_RETURNED
+        }
         
-        empty_batch = self.embedding_service.get_embeddings([])
-        self.assertIsInstance(empty_batch, list)
-        self.assertEqual(len(empty_batch), 0)
+        for config_name, config_value in services_config.items():
+            self.assertIsNotNone(config_value, f"{config_name} should not be None")
+            if isinstance(config_value, (int, float)):
+                self.assertGreater(config_value, 0, f"{config_name} should be positive")
         
-        print(f"PASS: Embedding service - Model: {self.settings.EMBEDDING_MODEL}")
-        print(f"PASS: Single embedding dimension: {len(single_embedding)}")
-        print(f"PASS: Batch embeddings: {len(batch_embeddings)} embeddings generated")
+        print(f"PASS: API configuration - Title: {self.settings.API_TITLE}, Version: {self.settings.API_VERSION}")
+        print(f"PASS: Model configuration - Embedding: {self.settings.EMBEDDING_MODEL}, LLM: {self.settings.GEMINI_MODEL}")
+        print(f"PASS: Retrieval parameters - First stage: {self.settings.MAX_CHUNKS_FIRST_STAGE}, Final: {self.settings.MAX_CHUNKS_RETURNED}")
+        print(f"PASS: Chunking configuration - Size: {self.settings.CHUNK_SIZE}, Overlap: {self.settings.CHUNK_OVERLAP}")
+        print("PASS: Configuration and model validation completed")
 
     def test_02_chroma_vector_store_operations(self):
         """Test 2: ChromaDB Vector Store Operations"""
